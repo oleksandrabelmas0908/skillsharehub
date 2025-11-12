@@ -1,2 +1,4 @@
 from .user_serializers import UserRegistrySerializer, UserSerializer
-from .chanel_serializers import ChanelCreateSerializer, ChanelOutSerializer
+from .chanel_serializers import ChanelCreateSerializer, ChanelOutSerializer, ChanelDetailSerializer
+from .post_serializers import PostOutSerializer, PostDetailSerializer, PostCreateSerializer, PostUpdateSerializer
+from .comment_serializers import CommentOutSerializer, CommentCreateSerializer

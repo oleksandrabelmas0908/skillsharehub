@@ -5,7 +5,7 @@ from skillsharehub.mainapp.models import Chanel
 
 import logging
 
-from ..serializers import ChanelOutSerializer, ChanelCreateSerializer
+from ..serializers import ChanelOutSerializer, ChanelCreateSerializer, ChanelDetailSerializer
 
 
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +39,7 @@ class ChanelManageViewSet(ModelViewSet):
     def retrieve(self, request, pk=None):
         try:
             chanel = self.get_object()
-            serializer = ChanelOutSerializer(chanel)
+            serializer = ChanelDetailSerializer(chanel)
             return Response(data=serializer.data, status=200)
         except Chanel.DoesNotExist:
             return Response(data={"detail": "Not found."}, status=404)
