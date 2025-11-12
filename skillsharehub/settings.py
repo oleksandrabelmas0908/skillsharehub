@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-ktti8#@#f9lm1)vm3!72k4uw#8!dk5fvfg6fe%n*y9oi7@sz*$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG")
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1").split(",")
 
 
 # Application definition
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'drf_spectacular',
+    "skillsharehub.mainapp",
     "rest_framework",
 ]
 
@@ -104,6 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+AUTH_USER_MODEL = "mainapp.CustomUser"
+
+
 
 
 
@@ -111,14 +116,19 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', 
 }
 
 
-
-
-
-
-
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SkillShareHub API',
+    'DESCRIPTION': 'API for SkillShareHub platform',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 
 LANGUAGE_CODE = "en-us"
