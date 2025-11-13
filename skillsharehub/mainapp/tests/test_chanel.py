@@ -1,4 +1,4 @@
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse
 from rest_framework import status
 
@@ -46,6 +46,9 @@ class ChanelManageDetailTests(APITestCase):
         )
         cls.chanel = Chanel.objects.create(name='Test Chanel', owner=cls.user)
         cls.url = reverse('chanel_manage_detail', kwargs={'pk': cls.chanel.pk})
+        cls.other_user = CustomUser.objects.create_user(
+            email='otheruser@example.com', first_name='Other', password='otherpass'
+        )
 
     def test_get_chanel_manage_detail(self):
         self.client.force_authenticate(user=self.user)
@@ -60,6 +63,14 @@ class ChanelManageDetailTests(APITestCase):
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], 'Updated Test Chanel')
+
+    def test_update_chanel_manage_another_user(self):
+        data = {
+            'name': 'Malicious Update Chanel',
+        }
+        self.client.force_authenticate(user=self.other_user)
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_patch_chanel_manage(self):
         data = {
@@ -98,6 +109,11 @@ class ChanelSubscribeTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn(self.user_subscriber, self.chanel.subscribers.all())
 
+    def test_subscribe_chanel_unauthenticated(self):
+        url = reverse('subscribe_chanel', kwargs={'pk': self.chanel.pk})
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_unsubscribe_chanel(self):
         url = reverse('unsubscribe_chanel', kwargs={'pk': self.chanel.pk})
         self.chanel.subscribers.add(self.user_subscriber)
@@ -105,3 +121,21 @@ class ChanelSubscribeTest(APITestCase):
         response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotIn(self.user_subscriber, self.chanel.subscribers.all())
+
+    def test_unsubscribe_chanel_unauthenticated(self):
+        url = reverse('unsubscribe_chanel', kwargs={'pk': self.chanel.pk})
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)    
+
+    def test_subscribe_chanel_already_subscribed(self):
+        url = reverse('subscribe_chanel', kwargs={'pk': self.chanel.pk})
+        self.chanel.subscribers.add(self.user_subscriber)
+        self.client.force_authenticate(user=self.user_subscriber)
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unsubscribe_chanel_not_subscribed(self):
+        url = reverse('unsubscribe_chanel', kwargs={'pk': self.chanel.pk})
+        self.client.force_authenticate(user=self.user_subscriber)
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

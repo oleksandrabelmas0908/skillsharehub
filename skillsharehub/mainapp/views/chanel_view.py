@@ -46,9 +46,11 @@ class ChanelManageViewSet(ModelViewSet):
         
     def update(self, request, pk=None):
         chanel = self.get_object()
-        # Pass context so serializer can access request.user; owner is read-only
         serializer = ChanelCreateSerializer(chanel, data=request.data, partial=False, context={'request': request})
         if serializer.is_valid():
+            if chanel.owner != request.user:
+                logger.warning(f"User {request.user} attempted to update chanel {chanel} they do not own.")
+                return Response(data={"detail": "You do not own this chanel."}, status=403)
             chanel = serializer.save()
             output_serializer = ChanelOutSerializer(chanel)
             return Response(data=output_serializer.data, status=200)
@@ -58,10 +60,21 @@ class ChanelManageViewSet(ModelViewSet):
         chanel = self.get_object()
         serializer = ChanelCreateSerializer(chanel, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
+            if chanel.owner != request.user:
+                logger.warning(f"User {request.user} attempted to patch chanel {chanel} they do not own.")
+                return Response(data={"detail": "You do not own this chanel."}, status=403)
             chanel = serializer.save()
             output_serializer = ChanelOutSerializer(chanel)
             return Response(data=output_serializer.data, status=200)
         return Response(data=serializer.errors, status=400)
+    
+    def destroy(self, request, pk=None):
+        chanel = self.get_object()
+        if chanel.owner != request.user:
+            logger.warning(f"User {request.user} attempted to delete chanel {chanel} they do not own.")
+            return Response(data={"detail": "You do not own this chanel."}, status=403)
+        chanel.delete()
+        return Response(status=204)
     
 
 class ChanelSubscribeViewSet(ModelViewSet):

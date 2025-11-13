@@ -34,8 +34,8 @@ urlpatterns = [
     }), name='post_manage_detail'),
 
     path('comments/<int:post_pk>/', CommentPostViewSet.as_view({'get': 'list'}), name='comment_post_list'),
-    path('comments/manage/<int:post_pk>/', CommentManageViewSet.as_view({'post': 'create'}), name='comment_manage_list'),
-    path('comments/manage/delete/<int:pk>/', CommentManageViewSet.as_view({'delete': 'destroy'}), name='comment_manage_detail'),
+    path('comments/manage/<int:post_pk>/', CommentManageViewSet.as_view({'post': 'create'}), name='comment_manage'),
+    path('comments/manage/delete/<int:pk>/', CommentManageViewSet.as_view({'delete': 'destroy'}), name='comment_manage_delete'),
 
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

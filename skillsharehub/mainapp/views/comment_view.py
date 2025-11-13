@@ -29,7 +29,7 @@ class CommentManageViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = CommentCreateSerializer
-    http_method_names = ['post', 'delete', 'head', 'options']
+    http_method_names = ['post', 'put', 'delete', 'head', 'options']
 
     def create(self, request, post_pk=None):
         serializer = self.serializer_class(data=request.data)
