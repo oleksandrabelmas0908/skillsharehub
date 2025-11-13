@@ -14,7 +14,7 @@ urlpatterns = [
     path('auth/', RegisterView.as_view(), name='register'),
 
     path('chanels/', ChanelShowViewSet.as_view({'get': 'list'}), name='chanel_show'),
-    path('chanels/manage/', ChanelManageViewSet.as_view({'post': 'create'}), name='chanel_manage_list'),
+    path('chanels/manage/', ChanelManageViewSet.as_view({'post': 'create'}), name='chanel_manage_create'),
     path('chanels/manage/<int:pk>/', ChanelManageViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
